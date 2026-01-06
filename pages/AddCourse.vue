@@ -426,14 +426,14 @@ export default {
                   this.form.coverImage = null;
                   this.loading = false;
                } else {
-                  this.showAlert("error", `${resData.data.message}`);
+                  this.showNotif("error", `${resData.data.message}`);
                   this.form.coverImage = null;
                   this.loading = false;
                }
                this.$refs.anyName.reset();
             } catch (err) {
                if (err.response) {
-                  this.showAlert("error", `${response.data.message}`);
+                  this.showNotif("error", `${err.response.data.message}`);
                   this.loading = false;
                }
                this.form.coverImage = null;
@@ -441,7 +441,7 @@ export default {
                this.loading = false;
             }
          } else {
-            this.showAlert(
+            this.showNotif(
                "error",
                "There are items that require your attention."
             );
