@@ -169,37 +169,62 @@ export default {
             this.cartData = [];
          }
       },
-      async deleteOrder(id) {
-         try {
-            this.loadingDelete = true;
-            this.catalogData = [];
-            
-            // ==========================================
-            // PROXY SETUP: DELETE request routing melalui frontend proxy
-            // ==========================================
-            // Old (Direct to backend):
-            // const res = await this.$axios.delete(`${process.env.NUXT_ENV_API_URL}/api/v1/order/${id}`);
-            
-            // New (Melalui proxy frontend):
-            // DELETE request ke /api/v1/order/{id} akan di-proxy ke backend AWS ELB
-            const res = await this.$axios.delete(`/api/v1/order/${id}`);
-            const resData = res.data;
-            if (resData.status == "OK") {
-               this.getOrder();
-               this.showNotif("Success", resData.message);
-            }
-            this.loadingDelete = false;
-         } catch (error) {
-            if (error.response) {
-               const errData = error.response.data;
-               this.showNotif("warning", `${errData.error.message}`);
-            } else {
-               this.showNotif("error", "Internal Server Error.");
-            }
-            this.loadingDelete = false;
-            this.cartData = [];
-         }
-      },
+       async deleteOrder(id) {
+          try {
+             this.loadingDelete = true;
+             this.catalogData = [];
+             
+             // ==========================================
+             // PROXY SETUP: DELETE request routing melalui frontend proxy
+             // ==========================================
+             // Old (Direct to backend):
+             // const res = await this.$axios.delete(`${process.env.NUXT_ENV_API_URL}/api/v1/order/${id}`);
+             
+             // New (Melalui proxy frontend):
+             // DELETE request ke /api/v1/order/{id} akan di-proxy ke backend AWS ELB
+             const res = await this.$axios.delete(`/api/v1/order/${id}`);
+             const resData = res.data;
+             
+             if (resData.status == "OK") {
+                this.getOrder();
+                this.showNotif("success", resData.message || "Delete order success");
+             } else {
+                this.showNotif("warning", resData.message || "Failed to delete order");
+             }
+             this.loadingDelete = false;
+          } catch (error) {
+             // Improved error handling untuk berbagai response format
+             this.loadingDelete = false;
+             this.cartData = [];
+             
+             if (error.response) {
+                // Backend return error response (400, 404, 500, etc)
+                const errData = error.response.data;
+                const status = error.response.status;
+                
+                // Safe property access - handle berbagai response format
+                let errorMessage = 'Failed to delete order';
+                
+                if (errData) {
+                   // Try different error message formats
+                   errorMessage = errData.message || 
+                                 errData?.error?.message || 
+                                 errData?.error || 
+                                 (typeof errData === 'string' ? errData : errorMessage);
+                }
+                
+                // Specific message for 404
+                if (status === 404) {
+                   errorMessage = 'Order not found or already deleted';
+                }
+                
+                this.showNotif("error", errorMessage);
+             } else {
+                // Network error atau backend tidak reachable
+                this.showNotif("error", "Cannot connect to server. Please check your connection.");
+             }
+          }
+       },
    },
 };
 </script>
