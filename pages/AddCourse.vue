@@ -431,15 +431,21 @@ export default {
                   this.loading = false;
                }
                this.$refs.anyName.reset();
-            } catch (err) {
-               if (err.response) {
-                  this.showNotif("error", `${err.response.data.message}`);
-                  this.loading = false;
-               }
-               this.form.coverImage = null;
-               this.showNotif("error", "Internal Server Error.");
-               this.loading = false;
-            }
+             } catch (err) {
+                // Fix: Proper if-else untuk error handling
+                this.form.coverImage = null;
+                this.loading = false;
+                
+                if (err.response) {
+                   // Backend return error dengan response
+                   const errData = err.response.data;
+                   const errorMessage = errData?.message || errData?.error?.message || 'Failed to add course';
+                   this.showNotif("error", errorMessage);
+                } else {
+                   // Network error atau backend tidak reachable
+                   this.showNotif("error", "Cannot connect to server");
+                }
+             }
          } else {
             this.showNotif(
                "error",
