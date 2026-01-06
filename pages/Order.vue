@@ -140,9 +140,16 @@ export default {
          try {
             this.loading = true;
             this.catalogData = [];
-            const res = await this.$axios.get(
-               `${process.env.NUXT_ENV_API_URL}/api/v1/order`
-            );
+            
+            // ==========================================
+            // PROXY SETUP: GET request routing melalui frontend proxy
+            // ==========================================
+            // Old (Direct to backend):
+            // const res = await this.$axios.get(`${process.env.NUXT_ENV_API_URL}/api/v1/order`);
+            
+            // New (Melalui proxy frontend):
+            // Request ke /api/v1/order akan di-proxy ke backend AWS ELB
+            const res = await this.$axios.get('/api/v1/order');
 
             const resData = res.data;
             if (resData.status == "OK") {
@@ -166,9 +173,16 @@ export default {
          try {
             this.loadingDelete = true;
             this.catalogData = [];
-            const res = await this.$axios.delete(
-               `${process.env.NUXT_ENV_API_URL}/api/v1/order/${id}`
-            );
+            
+            // ==========================================
+            // PROXY SETUP: DELETE request routing melalui frontend proxy
+            // ==========================================
+            // Old (Direct to backend):
+            // const res = await this.$axios.delete(`${process.env.NUXT_ENV_API_URL}/api/v1/order/${id}`);
+            
+            // New (Melalui proxy frontend):
+            // DELETE request ke /api/v1/order/{id} akan di-proxy ke backend AWS ELB
+            const res = await this.$axios.delete(`/api/v1/order/${id}`);
             const resData = res.data;
             if (resData.status == "OK") {
                this.getOrder();

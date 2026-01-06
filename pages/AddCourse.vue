@@ -416,7 +416,7 @@ export default {
 
             try {
                const updateData = await this.$axios.post(
-                  `${process.env.NUXT_ENV_API_URL}/api/v1/course`,
+                  '/api/v1/course',
                   this.form.coverImage == null ? this.form : formData
                );
                this.form.coverImage = null;

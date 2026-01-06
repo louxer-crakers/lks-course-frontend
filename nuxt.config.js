@@ -50,7 +50,20 @@ export default {
 
    // Axios module configuration: https://go.nuxtjs.dev/config-axios
    axios: {
-      // proxy: true,
+      // PROXY SETUP: Enable proxy mode untuk routing semua request melalui frontend
+      // Old: proxy: true (commented out)
+      proxy: true, // ✅ Aktifkan proxy untuk semua HTTP methods (GET, POST, PUT, DELETE, dll)
+   },
+
+   // PROXY CONFIGURATION: Route semua request ke /api/* ke backend AWS ELB
+   // Frontend sekarang bertindak sebagai proxy untuk semua komunikasi client-backend
+   // Support: GET, POST, PUT, DELETE, PATCH, OPTIONS, HEAD - semua HTTP methods
+   proxy: {
+      '/api/': {
+         // Backend target: AWS ELB internal load balancer
+         target: process.env.NUXT_ENV_API_URL || 'http://internal-lks-lb-backend-271785892.us-east-1.elb.amazonaws.com',
+         changeOrigin: true, // Set Origin header untuk menghindari CORS issues
+      }
    },
 
    // Vuetify module configuration: https://go.nuxtjs.dev/config-vuetify

@@ -161,9 +161,16 @@ export default {
          try {
             this.catalogLoading = true;
             this.catalogData = [];
-            const res = await this.$axios.get(
-               `${process.env.NUXT_ENV_API_URL}/api/v1/course`
-            );
+            
+            // ==========================================
+            // PROXY SETUP: Request routing melalui frontend proxy
+            // ==========================================
+            // Old (Direct to backend):
+            // const res = await this.$axios.get(`${process.env.NUXT_ENV_API_URL}/api/v1/course`);
+            
+            // New (Melalui proxy frontend):
+            // Request ke /api/v1/course akan di-proxy ke backend AWS ELB
+            const res = await this.$axios.get('/api/v1/course');
 
             const resData = res.data;
             if (resData.status == "SUCCESS") {
@@ -231,10 +238,15 @@ export default {
                bank: "mandiri",
             };
 
-            await this.$axios.post(
-               `${process.env.NUXT_ENV_API_URL}/api/v1/order`,
-               order
-            );
+            // ==========================================
+            // PROXY SETUP: POST request routing melalui frontend proxy
+            // ==========================================
+            // Old (Direct to backend):
+            // await this.$axios.post(`${process.env.NUXT_ENV_API_URL}/api/v1/order`, order);
+            
+            // New (Melalui proxy frontend):
+            // POST request ke /api/v1/order akan di-proxy ke backend AWS ELB
+            await this.$axios.post('/api/v1/order', order);
 
             this.cartData = [];
 
@@ -254,9 +266,16 @@ export default {
       async deleteCourse(id) {
          try {
             this.loadingDelete = true;
-            const res = await this.$axios.delete(
-               `${process.env.NUXT_ENV_API_URL}/api/v1/course/${id}`
-            );
+            
+            // ==========================================
+            // PROXY SETUP: DELETE request routing melalui frontend proxy
+            // ==========================================
+            // Old (Direct to backend):
+            // const res = await this.$axios.delete(`${process.env.NUXT_ENV_API_URL}/api/v1/course/${id}`);
+            
+            // New (Melalui proxy frontend):
+            // DELETE request ke /api/v1/course/{id} akan di-proxy ke backend AWS ELB
+            const res = await this.$axios.delete(`/api/v1/course/${id}`);
             const resData = res.data;
             if (resData.status == "SUCCESS") {
                this.getCourse();
